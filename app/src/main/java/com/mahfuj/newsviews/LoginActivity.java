@@ -75,6 +75,12 @@ public class LoginActivity extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if(account!=null)
+            {
+                Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                i.putExtra("google_account", account);
+                startActivity(i);
+            }
             String val = account.getDisplayName();
         } catch (ApiException e) {
             Log.i("Error",e.getLocalizedMessage());

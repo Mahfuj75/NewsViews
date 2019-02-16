@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/complain_card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/MyCardViewStyle"
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPaddingLeft="5dp"
+    card_view:contentPaddingRight="5dp"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="3dp">
+
+    <LinearLayout
+
+        android:id="@+id/row_view_LinearLayout"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:fontFamily="serif"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent"
+                android:textSize="12sp"
+
+                android:textColor="#212121"
+                android:text="Mcafee.com"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/textView_complain_date"
+                android:layout_gravity="start"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                android:orientation="vertical">
+                <TextView
+                    android:fontFamily="serif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#212121"
+                    android:text="2019-02-16"
+
+                    android:layout_gravity="end"/>
+                <TextView
+                    android:fontFamily="serif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#212121"
+                    android:text="15:08"
+                    android:layout_gravity="end"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#BDBDBD"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
+            <TextView
+                android:fontFamily="serif"
+                android:layout_weight=".7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:text="The Risks of Public Wi-Fi and How to Close the Security Gap"
+                android:id="@+id/textView4" />
+
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:fontFamily="serif"
+                android:layout_weight=".7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:text="Complain Date:"
+                android:id="@+id/textView_lastSeenDateName"/>
+            <TextView
+                android:fontFamily="serif"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#212121"
+                android:paddingBottom="10dp"
+                android:text="1-11-2016"
+                android:textAlignment="center"
+                android:id="@+id/textView_incident_date"/>
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:fontFamily="serif"
+                android:layout_weight="0.7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#212121"
+                android:textStyle="bold"
+                android:paddingBottom="10dp"
+                android:text="Location:" />
+
+
+            <TextView
+                android:fontFamily="serif"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#212121"
+                android:textAlignment="center"
+                android:text="Complain Location"
+                android:id="@+id/textView_incident_location" />
+
+
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

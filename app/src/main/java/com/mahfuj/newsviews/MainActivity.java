@@ -12,11 +12,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    GoogleSignInAccount account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        GoogleSignInAccount account= (GoogleSignInAccount) getIntent().getSerializableExtra("google_account");
+        account= GoogleSignIn.getLastSignedInAccount(this);
 
         FloatingActionButton fab =  findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -42,7 +49,27 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView =  findViewById(R.id.nav_view);
+        TextView textViewPersonName = navigationView.getHeaderView(0).findViewById(R.id.textViewPersonName);
+        CircleImageView imageView = navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        TextView textViewEmail = navigationView.getHeaderView(0).findViewById(R.id.textViewEmail);
+
+
+        textViewPersonName.setText(account.getDisplayName());
+        Picasso.with(this).load(account.getPhotoUrl()).into(imageView);
+        textViewEmail.setText(account.getEmail());
+
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+/*        textViewPersonName.setText();*/
+        //
+
+
+
+
+
+
     }
 
     @Override
@@ -76,6 +103,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
