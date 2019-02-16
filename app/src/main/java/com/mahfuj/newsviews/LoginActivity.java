@@ -44,6 +44,14 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+        if(account!=null)
+        {
+            Intent i = new Intent(getApplicationContext(),MainActivity.class);
+            i.putExtra("google_account", account);
+            startActivity(i);
+        }
     }
 
     private void signIn() {
