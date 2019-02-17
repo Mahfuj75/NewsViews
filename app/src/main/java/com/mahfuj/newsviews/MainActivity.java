@@ -1,12 +1,14 @@
 package com.mahfuj.newsviews;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -18,7 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -44,16 +45,18 @@ public class MainActivity extends AppCompatActivity
 
     GoogleSignInAccount account;
     JsonToJava jsonToJava;
+    SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar =  findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        account= GoogleSignIn.getLastSignedInAccount(this);
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        swipeContainer =  findViewById(R.id.swipeContainer);
 
-        FloatingActionButton fab =  findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,13 +65,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView =  findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         TextView textViewPersonName = navigationView.getHeaderView(0).findViewById(R.id.textViewPersonName);
         CircleImageView imageView = navigationView.getHeaderView(0).findViewById(R.id.imageView);
         TextView textViewEmail = navigationView.getHeaderView(0).findViewById(R.id.textViewEmail);
@@ -80,11 +83,25 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+
+            public void onRefresh() {
+
+                JsonTask jsonTask = new JsonTask();
+                jsonTask.execute("https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7");
+
+            }
+
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,android.R.color.holo_green_light,android.R.color.holo_orange_light,android.R.color.holo_red_light);
+
         JsonTask jsonTask = new JsonTask();
         jsonTask.execute("https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7");
 
 
-/*        textViewPersonName.setText();*/
+
 
 
 
@@ -157,6 +174,8 @@ public class MainActivity extends AppCompatActivity
     private class JsonTask extends AsyncTask<String, String, String> {
         protected void onPreExecute() {
             super.onPreExecute();
+            swipeContainer.setRefreshing(true);
+
         }
 
 
@@ -217,6 +236,8 @@ public class MainActivity extends AppCompatActivity
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles());
                 recyclerView.setAdapter(adapter);
+                swipeContainer.setRefreshing(false);
+
             }
         }
     }
