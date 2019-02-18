@@ -3,6 +3,7 @@ package com.mahfuj.newsviews;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,12 +43,16 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity
+public class NewsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     GoogleSignInAccount account;
     JsonToJava jsonToJava;
     SwipeRefreshLayout swipeContainer;
+    String url = "https://newsapi.org/v2/everything?q=";
+    String quarry = "https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7";
+    String extra = "&sortBy=recent";
+    String key ="&apiKey=fe9050a9325149b2adf22684fa8425b7";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,8 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         account = GoogleSignIn.getLastSignedInAccount(this);
         swipeContainer =  findViewById(R.id.swipeContainer);
+        handleIntent(getIntent());
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +99,7 @@ public class MainActivity extends AppCompatActivity
             public void onRefresh() {
 
                 JsonTask jsonTask = new JsonTask();
-                jsonTask.execute("https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7");
+                jsonTask.execute(quarry);
 
             }
 
@@ -100,17 +107,7 @@ public class MainActivity extends AppCompatActivity
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,android.R.color.holo_green_light,android.R.color.holo_orange_light,android.R.color.holo_red_light);
 
         JsonTask jsonTask = new JsonTask();
-        jsonTask.execute("https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7");
-
-
-
-
-
-
-
-
-
-
+        jsonTask.execute(quarry);
 
 
     }
@@ -182,6 +179,25 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            JsonTask jsonTask = new JsonTask();
+            this.quarry = url+query+extra+key;
+            jsonTask.execute(this.quarry);
+
+        }
+    }
+
     ///
     @SuppressLint("StaticFieldLeak")
     private class JsonTask extends AsyncTask<String, String, String> {
@@ -213,9 +229,7 @@ public class MainActivity extends AppCompatActivity
                     response.append(line);
                 }
 
-                String val = response.toString();
                 jsonToJava = new Gson().fromJson(response.toString(), JsonToJava.class);
-                val = jsonToJava.getStatus();
                 return null;
 
 
@@ -242,7 +256,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            String val = jsonToJava.getStatus();
             if(jsonToJava!=null)
             {
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -258,6 +271,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
 
     ///
 

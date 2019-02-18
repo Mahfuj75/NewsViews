@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -63,8 +64,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.textViewSource.setText(articleArrayList.get(position).getSource().getName());
         String dtStart = articleArrayList.get(position).getPublishedAt();
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        @SuppressLint("SimpleDateFormat") final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         format.setTimeZone(TimeZone.getTimeZone("GMT+6"));
         try {
             Date date = format.parse(dtStart);
@@ -89,17 +89,19 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         Picasso.with(context).load(articleArrayList.get(position).getUrlToImage()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                holder.imageViewSourceImage.setMaxHeight(40000);
+                holder.imageViewSourceImage.setMaxHeight(1000);
                 holder.imageViewSourceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                holder.imageViewSourceImage.setImageBitmap(bitmap);
-
+                //holder.imageViewSourceImage.setImageBitmap();
             }
 
             @Override
-            public void onBitmapFailed(Drawable errorDrawable) { }
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
 
             @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {}
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
         });
         /*Picasso.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
@@ -128,6 +130,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 TextView textViewAuthor = convertView.findViewById(R.id.textViewAuthor);
                 TextView textViewDescription = convertView.findViewById(R.id.textViewDescription);
                 TextView textViewDescriptionMain = convertView.findViewById(R.id.textViewDescriptionMain);
+                ImageButton btnCancel = convertView.findViewById(R.id.btnCancel);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     textViewSource.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
@@ -153,7 +156,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 Picasso.with(context).load(articleArrayList.get(Integer.parseInt(holder.textViewTitle.getTag().toString())).getUrlToImage()).into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        imageViewSourceImage.setMaxHeight(40000);
+                        imageViewSourceImage.setMaxHeight(1000);
                         imageViewSourceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
                         imageViewSourceImage.setImageBitmap(bitmap);
 
@@ -162,10 +165,13 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
 
+                        String val = "";
                     }
 
                     @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {}
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
                 });
 
 
@@ -193,11 +199,17 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 Linkify.addLinks(textViewDescriptionMain, Linkify.WEB_URLS);
 
 
-                AlertDialog dialogInside = alertDialog.create();
+                final AlertDialog dialogInside = alertDialog.create();
                 Objects.requireNonNull(dialogInside.getWindow()).setAttributes(lp);
                 dialogInside.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
                 dialogInside.show();
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogInside.dismiss();
+                    }
+                });
 
 
 

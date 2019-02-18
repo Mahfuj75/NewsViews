@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if(account!=null)
         {
-            Intent i = new Intent(getApplicationContext(),MainActivity.class);
+            Intent i = new Intent(getApplicationContext(), NewsActivity.class);
             i.putExtra("google_account", account);
             startActivity(i);
         }
@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if(account!=null)
             {
-                Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                Intent i = new Intent(getApplicationContext(), NewsActivity.class);
                 i.putExtra("google_account", account);
                 startActivity(i);
             }
