@@ -27,5 +27,6 @@
     <string name="fb_login_protocol_scheme">fb744542852611733</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="news_corporation">News Corporation</string>
+    <string name="search_here">search here</string>
 
 </resources>

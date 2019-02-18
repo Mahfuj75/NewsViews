@@ -1,8 +1,8 @@
 package com.mahfuj.newsviews;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -127,6 +129,14 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        assert searchManager != null;
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -139,6 +149,9 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.search) {
             return true;
         }
 
@@ -232,10 +245,14 @@ public class MainActivity extends AppCompatActivity
             String val = jsonToJava.getStatus();
             if(jsonToJava!=null)
             {
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
                 RecyclerView recyclerView = findViewById(R.id.recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles());
+                MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles(),lp);
                 recyclerView.setAdapter(adapter);
+
                 swipeContainer.setRefreshing(false);
 
             }
