@@ -65,6 +65,7 @@ public class NewsActivity extends AppCompatActivity
         handleIntent(getIntent());
 
 
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,7 +105,11 @@ public class NewsActivity extends AppCompatActivity
             }
 
         });
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,android.R.color.holo_green_light,android.R.color.holo_orange_light,android.R.color.holo_red_light);
+        swipeContainer.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         JsonTask jsonTask = new JsonTask();
         jsonTask.execute(quarry);
@@ -161,18 +166,25 @@ public class NewsActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        switch (id) {
+            case R.id.nav_bbc:
+                // Handle the camera action
+                break;
+            case R.id.nav_cnbc:
 
-        } else if (id == R.id.nav_slideshow) {
+                break;
+            case R.id.nav_engadget:
 
-        } else if (id == R.id.nav_manage) {
+                break;
+            case R.id.nav_espn:
 
-        } else if (id == R.id.nav_share) {
+                break;
+            case R.id.nav_share:
 
-        } else if (id == R.id.nav_send) {
+                break;
+            case R.id.nav_send:
 
+                break;
         }
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
@@ -265,9 +277,11 @@ public class NewsActivity extends AppCompatActivity
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles(),lp);
                 recyclerView.setAdapter(adapter);
-
                 swipeContainer.setRefreshing(false);
 
+            }
+            else {
+                swipeContainer.setRefreshing(false);
             }
         }
     }

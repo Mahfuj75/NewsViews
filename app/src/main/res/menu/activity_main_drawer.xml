@@ -5,21 +5,29 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_bbc"
+            android:icon="@drawable/bbc"
+            android:title="BBC" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_cnbc"
+            android:icon="@drawable/cnbc"
+            android:title="CNBC" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_engadget"
+            android:icon="@drawable/engadget"
+            android:title="Engadget" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_espn"
+            android:icon="@drawable/espn"
+            android:title="ESPN" />
+        <item
+            android:id="@+id/nav_fox_news"
+            android:icon="@drawable/fox_news"
+            android:title="FOX NEWS" />
+        <item
+            android:id="@+id/nav_ign"
+            android:icon="@drawable/ign"
+            android:title="IGN" />
     </group>
 
     <item android:title="Communicate">

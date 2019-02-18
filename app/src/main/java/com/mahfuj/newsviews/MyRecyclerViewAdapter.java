@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mahfuj.newsviews.JsonToJava.Article;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import java.text.ParseException;
@@ -86,22 +87,38 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 .placeholder(R.drawable.ic_logo)
                 .error(R.drawable.ic_logo)
                 .into(holder.imageViewSourceImage);*/
-        Picasso.with(context).load(articleArrayList.get(position).getUrlToImage()).into(new Target() {
+        Picasso.with(context)
+                .load(articleArrayList.get(position).getUrlToImage())
+                .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+
                 holder.imageViewSourceImage.setMaxHeight(1000);
-                holder.imageViewSourceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                //holder.imageViewSourceImage.setImageBitmap();
+                holder.imageViewSourceImage.setImageBitmap(bitmap);
+                holder.progressAnimation.setVisibility(View.GONE);
+                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+                holder.progressAnimation.setVisibility(View.GONE);
+                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
+                holder.imageViewSourceImage.setMaxHeight(400);
+                holder.imageViewSourceImage.setImageResource(R.drawable.default_001);
+
+
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+                holder.progressAnimation.setVisibility(View.VISIBLE);
+                holder.imageViewSourceImage.setVisibility(View.GONE);
+                holder.progressAnimation.setImageResource(R.drawable.progress_animation);
 
             }
+
+
         });
         /*Picasso.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
@@ -225,6 +242,22 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return articleArrayList.size();
     }
 
+    private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -234,6 +267,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         TextView textViewTitle;
         ImageView imageViewSourceImage;
         TextView textViewAuthor;
+        ImageView progressAnimation;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -243,6 +277,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             textViewTitle = itemView.findViewById(R.id.textViewTitle);
             imageViewSourceImage = itemView.findViewById(R.id.imageViewSourceImage);
             textViewAuthor = itemView.findViewById(R.id.textViewAuthor);
+            progressAnimation = itemView.findViewById(R.id.progress_animation);
 
 
             itemView.setOnClickListener(this);

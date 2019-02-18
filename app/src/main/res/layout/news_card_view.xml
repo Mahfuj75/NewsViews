@@ -87,9 +87,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:src="@drawable/default_001"
-                android:adjustViewBounds="true"
-                android:maxHeight="150dp"/>
+                android:adjustViewBounds="true" />
+            <ImageView
+                android:layout_gravity="center"
+                android:id="@+id/progress_animation"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_progress2"/>
             <TextView
                 android:id="@+id/textViewAuthor"
                 android:layout_marginTop="4dp"
