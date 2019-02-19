@@ -1,18 +1,12 @@
 package com.mahfuj.newsviews;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -24,10 +18,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.mahfuj.newsviews.JsonToJava.Article;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,16 +36,10 @@ import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
     private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
     private ArrayList<Article> articleArrayList;
     private Context context;
     private WindowManager.LayoutParams lp;
 
-    private static final int MAX_WIDTH = 1024;
-    private static final int MAX_HEIGHT = 768;
-    private int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
-
-    // data is passed into the constructor
     MyRecyclerViewAdapter(Context context, ArrayList<Article> articleArrayList, WindowManager.LayoutParams lp) {
         this.mInflater = LayoutInflater.from(context);
         this.articleArrayList = articleArrayList;
@@ -88,56 +78,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             holder.textViewTitle.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
         }
         holder.textViewAuthor.setText(articleArrayList.get(position).getAuthor());
-        /*Picasso.with(context).load(articleArrayList.get(position).getUrlToImage())
-                .placeholder(R.drawable.ic_logo)
-                .error(R.drawable.ic_logo)
-                .into(holder.imageViewSourceImage);*/
-        /*String url = articleArrayList.get(position).getUrlToImage();
-        Picasso.with(context)
-                .load(articleArrayList.get(position).getUrlToImage())
-                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
-                .resize(size, size)
-                .centerInside()
-                .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-
-                holder.imageViewSourceImage.setMaxHeight(1000);
-                holder.imageViewSourceImage.setImageBitmap(bitmap);
-                holder.progressAnimation.setVisibility(View.GONE);
-                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                holder.progressAnimation.setVisibility(View.GONE);
-                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
-                holder.imageViewSourceImage.setMaxHeight(400);
-                holder.imageViewSourceImage.setImageResource(R.drawable.default_001);
-
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                holder.progressAnimation.setVisibility(View.VISIBLE);
-                holder.imageViewSourceImage.setVisibility(View.GONE);
-                holder.progressAnimation.setImageResource(R.drawable.progress_animation);
-
-            }
-
-
-        });*/
         setImage(position,holder);
-        /*Picasso.with(context)
-                .load(articleArrayList.get(position).getUrlToImage())
-                .centerInside()
-                .placeholder(R.drawable.default_001)
-                .error(R.drawable.default_001)
-                .fit()
-                .into(holder.imageViewSourceImage);
-        holder.textViewAuthor.setText(articleArrayList.get(position).getAuthor());*/
         holder.textViewTitle.setTag(position);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +96,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 TextView textViewTime = convertView.findViewById(R.id.textViewTime);
                 TextView textViewTitle = convertView.findViewById(R.id.textViewTitle);
                 final ImageView imageViewSourceImage = convertView.findViewById(R.id.imageViewSourceImage);
+                ImageView progressAnimation = convertView.findViewById(R.id.progress_animation);
                 TextView textViewAuthor = convertView.findViewById(R.id.textViewAuthor);
                 TextView textViewDescription = convertView.findViewById(R.id.textViewDescription);
                 TextView textViewDescriptionMain = convertView.findViewById(R.id.textViewDescriptionMain);
@@ -180,26 +123,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Picasso.with(context).load(articleArrayList.get(Integer.parseInt(holder.textViewTitle.getTag().toString())).getUrlToImage()).into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        imageViewSourceImage.setMaxHeight(1000);
-                        imageViewSourceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                        imageViewSourceImage.setImageBitmap(bitmap);
-
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                });
-
+                setImage(Integer.parseInt(holder.textViewTitle.getTag().toString()),imageViewSourceImage,progressAnimation);
 
                 textViewTitle.setText(articleArrayList.get(Integer.parseInt(holder.textViewTitle.getTag().toString())).getTitle());
                 textViewAuthor.setText(articleArrayList.get(Integer.parseInt(holder.textViewTitle.getTag().toString())).getAuthor());
@@ -228,7 +152,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 final AlertDialog dialogInside = alertDialog.create();
                 Objects.requireNonNull(dialogInside.getWindow()).setAttributes(lp);
                 dialogInside.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
                 dialogInside.show();
                 btnCancel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -251,58 +174,60 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return articleArrayList.size();
     }
 
-    public void setItem(ArrayList<Article> articleArrayList) {
+    void setItem(ArrayList<Article> articleArrayList) {
         this.articleArrayList = articleArrayList;
     }
 
     private void setImage(final int position, final ViewHolder holder) {
 
+        holder.progressAnimation.setVisibility(View.VISIBLE);
+        holder.imageViewSourceImage.setVisibility(View.VISIBLE);
+        holder.progressAnimation.setImageResource(R.drawable.progress_animation);
+
         Glide.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
                 .centerCrop()
                 .fitCenter()
-                .placeholder(R.drawable.progress_animation)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressAnimation.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressAnimation.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
                 .into( holder.imageViewSourceImage);
-        /*Picasso.with(context)
+    }
+    private void  setImage(final int position, final ImageView imageView, final ImageView progressAnimation) {
+        progressAnimation.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.VISIBLE);
+        progressAnimation.setImageResource(R.drawable.progress_animation);
+        Glide.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
-                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
-                .resize(size, size)
-                .centerInside()
-                .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                .centerCrop()
+                .fitCenter()
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        progressAnimation.setVisibility(View.GONE);
+                        return false;
+                    }
 
-
-                holder.imageViewSourceImage.setMaxHeight(1000);
-                holder.imageViewSourceImage.setImageBitmap(bitmap);
-                holder.progressAnimation.setVisibility(View.GONE);
-                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                holder.progressAnimation.setVisibility(View.GONE);
-                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
-                holder.imageViewSourceImage.setMaxHeight(400);
-                holder.imageViewSourceImage.setImageResource(R.drawable.default_001);
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                holder.progressAnimation.setVisibility(View.VISIBLE);
-                holder.imageViewSourceImage.setVisibility(View.GONE);
-                holder.progressAnimation.setImageResource(R.drawable.progress_animation);
-
-            }
-
-
-        });*/
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressAnimation.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into( imageView);
     }
 
-
-
-    // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder  {
         TextView textViewSource;
         TextView textViewDate;
         TextView textViewTime;
@@ -320,30 +245,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             imageViewSourceImage = itemView.findViewById(R.id.imageViewSourceImage);
             textViewAuthor = itemView.findViewById(R.id.textViewAuthor);
             progressAnimation = itemView.findViewById(R.id.progress_animation);
-
-
-            itemView.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-        }
-    }
 
-/*    // convenience method for getting data at click position
-    Article getItem(int id) {
-        return articleArrayList.get(id);
-    }
-
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }*/
-
-    // parent activity will implement this method to respond to click events
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 
 
