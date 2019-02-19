@@ -51,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent i = new Intent(getApplicationContext(), NewsActivity.class);
             i.putExtra("google_account", account);
             startActivity(i);
+            finish();
         }
     }
 
@@ -81,7 +82,6 @@ public class LoginActivity extends AppCompatActivity {
                 i.putExtra("google_account", account);
                 startActivity(i);
             }
-            String val = account.getDisplayName();
         } catch (ApiException e) {
             Log.i("Error",e.getLocalizedMessage());
         }

@@ -2,10 +2,12 @@ package com.mahfuj.newsviews;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,6 +29,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.mahfuj.newsviews.JsonToJava.Article;
 import com.mahfuj.newsviews.JsonToJava.JsonToJava;
@@ -46,13 +52,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class NewsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    GoogleSignInAccount account;
-    JsonToJava jsonToJava;
-    SwipeRefreshLayout swipeContainer;
-    String url = "https://newsapi.org/v2/everything?q=";
-    String quarry = "https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7";
-    String extra = "&sortBy=recent";
-    String key ="&apiKey=fe9050a9325149b2adf22684fa8425b7";
+    private JsonToJava jsonToJava;
+    private SwipeRefreshLayout swipeContainer;
+    private String quarry = "https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7";
+    private RecyclerView recyclerView;
+    private WindowManager.LayoutParams lp;
+    private MyRecyclerViewAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +66,28 @@ public class NewsActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        account = GoogleSignIn.getLastSignedInAccount(this);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         swipeContainer =  findViewById(R.id.swipeContainer);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+        lp = new WindowManager.LayoutParams();
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        Intent intent  = getIntent();
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
+        }
+
+
         handleIntent(getIntent());
 
 
@@ -87,6 +113,7 @@ public class NewsActivity extends AppCompatActivity
         TextView textViewEmail = navigationView.getHeaderView(0).findViewById(R.id.textViewEmail);
 
 
+        assert account != null;
         textViewPersonName.setText(account.getDisplayName());
         Picasso.with(this).load(account.getPhotoUrl()).into(imageView);
         textViewEmail.setText(account.getEmail());
@@ -133,11 +160,23 @@ public class NewsActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        ComponentName componentName = new ComponentName(getApplicationContext(),NewsActivity.class);
         SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
         assert searchManager != null;
         searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+                searchManager.getSearchableInfo(componentName));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         return true;
     }
@@ -150,7 +189,8 @@ public class NewsActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            signOut();
             return true;
         }
         if (id == R.id.search) {
@@ -165,26 +205,49 @@ public class NewsActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        JsonTask jsonTask;
         switch (id) {
+            case R.id.nav_breaking_news:
+                quarry = "https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
+                break;
             case R.id.nav_bbc:
-                // Handle the camera action
+                quarry ="https://newsapi.org/v2/everything?domains=bbc.co.uk&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
             case R.id.nav_cnbc:
-
+                quarry ="https://newsapi.org/v2/everything?domains=cnbc.com&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
             case R.id.nav_engadget:
-
+                quarry ="https://newsapi.org/v2/everything?domains=engadget.com&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
             case R.id.nav_espn:
-
+                quarry ="https://newsapi.org/v2/everything?domains=espncricinfo.com&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
-            case R.id.nav_share:
-
+            case R.id.nav_fox_news:
+                quarry ="https://newsapi.org/v2/everything?domains=foxnews.com&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
-            case R.id.nav_send:
-
+            case R.id.nav_ign:
+                quarry ="https://newsapi.org/v2/everything?domains=ign.com&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
                 break;
+            default:
+                quarry = "https://newsapi.org/v2/top-headlines?country=us&apiKey=fe9050a9325149b2adf22684fa8425b7";
+                jsonTask = new JsonTask();
+                jsonTask.execute(quarry);
+                break;
+
         }
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
@@ -204,11 +267,15 @@ public class NewsActivity extends AppCompatActivity
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             JsonTask jsonTask = new JsonTask();
-            this.quarry = url+query+extra+key;
+            String url = "https://newsapi.org/v2/top-headlines?q=";
+            //String extra = "&sortBy=recent";
+            String key = "&apiKey=fe9050a9325149b2adf22684fa8425b7";
+            this.quarry = url +query + key;
             jsonTask.execute(this.quarry);
 
         }
     }
+
 
     ///
     @SuppressLint("StaticFieldLeak")
@@ -270,20 +337,46 @@ public class NewsActivity extends AppCompatActivity
             super.onPostExecute(result);
             if(jsonToJava!=null)
             {
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-                RecyclerView recyclerView = findViewById(R.id.recycler_view);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles(),lp);
-                recyclerView.setAdapter(adapter);
-                swipeContainer.setRefreshing(false);
+
+
+                if(recyclerView.getAdapter()==null)
+                {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                    adapter = new MyRecyclerViewAdapter(getApplicationContext(), (ArrayList<Article>) jsonToJava.getArticles(),lp);
+                    recyclerView.setAdapter(adapter);
+                    swipeContainer.setRefreshing(false);
+                }
+                else
+                {
+                    adapter.setItem( (ArrayList<Article>) jsonToJava.getArticles());
+                    adapter.notifyDataSetChanged();
+                    swipeContainer.setRefreshing(false);
+                }
+
 
             }
             else {
+
                 swipeContainer.setRefreshing(false);
             }
         }
+    }
+
+
+    private void signOut() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent i  = new Intent(getApplicationContext(),LoginActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                });
     }
 
 

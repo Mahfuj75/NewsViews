@@ -42,7 +42,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private ItemClickListener mClickListener;
     private ArrayList<Article> articleArrayList;
     private Context context;
-    WindowManager.LayoutParams lp;
+    private WindowManager.LayoutParams lp;
+
+    private static final int MAX_WIDTH = 1024;
+    private static final int MAX_HEIGHT = 768;
+    private int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
 
     // data is passed into the constructor
     MyRecyclerViewAdapter(Context context, ArrayList<Article> articleArrayList, WindowManager.LayoutParams lp) {
@@ -87,8 +91,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 .placeholder(R.drawable.ic_logo)
                 .error(R.drawable.ic_logo)
                 .into(holder.imageViewSourceImage);*/
+        /*String url = articleArrayList.get(position).getUrlToImage();
         Picasso.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
+                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
+                .resize(size, size)
+                .centerInside()
                 .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -119,7 +127,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             }
 
 
-        });
+        });*/
+        setImage(position,holder);
         /*Picasso.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
                 .centerInside()
@@ -182,7 +191,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
 
-                        String val = "";
                     }
 
                     @Override
@@ -242,21 +250,47 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return articleArrayList.size();
     }
 
-    private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
+    public void setItem(ArrayList<Article> articleArrayList) {
+        this.articleArrayList = articleArrayList;
     }
+
+    private void setImage(final int position, final ViewHolder holder) {
+        Picasso.with(context)
+                .load(articleArrayList.get(position).getUrlToImage())
+                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
+                .resize(size, size)
+                .centerInside()
+                .networkPolicy(NetworkPolicy.OFFLINE).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+
+                holder.imageViewSourceImage.setMaxHeight(1000);
+                holder.imageViewSourceImage.setImageBitmap(bitmap);
+                holder.progressAnimation.setVisibility(View.GONE);
+                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                holder.progressAnimation.setVisibility(View.GONE);
+                holder.imageViewSourceImage.setVisibility(View.VISIBLE);
+                holder.imageViewSourceImage.setMaxHeight(400);
+                holder.imageViewSourceImage.setImageResource(R.drawable.default_001);
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                holder.progressAnimation.setVisibility(View.VISIBLE);
+                holder.imageViewSourceImage.setVisibility(View.GONE);
+                holder.progressAnimation.setImageResource(R.drawable.progress_animation);
+
+            }
+
+
+        });
+    }
+
 
 
     // stores and recycles views as they are scrolled off screen
@@ -303,12 +337,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
-
-
-
-
-
-
 
 
 }

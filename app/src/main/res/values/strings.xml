@@ -29,5 +29,6 @@
     <string name="news_corporation">News Corporation</string>
     <string name="search_here">search here</string>
     <string name="title_activity_search_results">SearchResultsActivity</string>
+    <string name="logout">Logout</string>
 
 </resources>
