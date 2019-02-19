@@ -23,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mahfuj.newsviews.JsonToJava.Article;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -255,7 +256,14 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
     private void setImage(final int position, final ViewHolder holder) {
-        Picasso.with(context)
+
+        Glide.with(context)
+                .load(articleArrayList.get(position).getUrlToImage())
+                .centerCrop()
+                .fitCenter()
+                .placeholder(R.drawable.progress_animation)
+                .into( holder.imageViewSourceImage);
+        /*Picasso.with(context)
                 .load(articleArrayList.get(position).getUrlToImage())
                 .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
                 .resize(size, size)
@@ -288,7 +296,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             }
 
 
-        });
+        });*/
     }
 
 
